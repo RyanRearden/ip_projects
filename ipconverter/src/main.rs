@@ -23,25 +23,25 @@ fn main() {
     }
 }
 
-fn bit8to16(ipv4addr: Ipv4Addr) -> Vec<u16> {
+fn bit8to16(ipv4addr: Ipv4Addr) -> [u16; 2] {
 
     let mut octets = ipv4addr.octets();
     println!("Your address is {}", ipv4addr);
 
-    let ipv4chunk: Vec<u16> = octets
+    let ipv4chunkvec: Vec<u16> = octets
         .chunks_exact(2)
         .map(|chunk| u16::from_be_bytes([chunk[0], chunk[1]]))
         .collect(); 
     
-    ipv4chunk
+    let ipv4chunkarr: [u16; 2] = ipv4chunkvec.try_into().expect("Error making u16 array from vector");
+    ipv4chunkarr
 }
 
-fn makeipv6(ipv4chunk: Vec<u16>) {
-    let segments: [u16; 2] = ipv4chunk.try_into().expect("err");
+fn makeipv6(ipv4chunk: [u16; 2]) {
     println!("Using 64:ff9b:: as the prefix");
 
     let ipv6_addr = Ipv6Addr::new(
-        0x0064, 0xff9b, 0x0000, 0x0000, 0x0000, 0x0000, segments[0], segments[1]
+        0x0064, 0xff9b, 0x0000, 0x0000, 0x0000, 0x0000, ipv4chunk[0], ipv4chunk[1]
     );
 
     println!("Ipv6 address: {}", ipv6_addr);
